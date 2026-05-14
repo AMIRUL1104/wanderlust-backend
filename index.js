@@ -5,7 +5,7 @@ const app = express();
 require("dotenv").config();
 const port = process.env.PORT;
 const uri = process.env.MONGO_URI;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 app.use(cors());
 app.use(express.json());
@@ -29,18 +29,50 @@ async function run() {
     //  "destination" collection select করা হয়েছে
     const destinationCollection = database.collection("destination");
 
-    app.get("/destination",async (req,res)=>{
+    app.get("/destination", async (req, res) => {
       const result = await destinationCollection.find().toArray();
-      res.json(result)
-    })
+      res.json(result);
+    });
+
+    app.get("/destination/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+
+      const query = {
+        _id: new ObjectId(id),
+      };
+
+      const result = await destinationCollection.findOne(query);
+      res.json(result);
+    });
 
     // add a new destination
     app.post("/destination", async (req, res) => {
       const newDestination = req.body;
       const result = await destinationCollection.insertOne(newDestination);
-      // console.log(result);
-      // Express.js ব্যাকএন্ড হলে:
-      // res.status(200).json({ message: "new destination added" });
+      res.send(result);
+    });
+
+    app.patch("/destination/:id", async (req, res) => {
+      const updatedData = req.body;
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      updatedDoc = {
+        $set: updatedData,
+      };
+      const result = await destinationCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+
+    app.delete("/destination/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = {
+        _id: new ObjectId(id),
+      };
+
+      const result = await userCollection.deleteOne(query);
+
       res.send(result);
     });
 
