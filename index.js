@@ -29,13 +29,19 @@ async function run() {
     //  "destination" collection select করা হয়েছে
     const destinationCollection = database.collection("destination");
 
+    app.get("/destination",async (req,res)=>{
+      const result = await destinationCollection.find().toArray();
+      res.json(result)
+    })
+
     // add a new destination
-    app.post("/add-destination", async (req, res) => {
+    app.post("/destination", async (req, res) => {
       const newDestination = req.body;
       const result = await destinationCollection.insertOne(newDestination);
-      console.log(result);
+      // console.log(result);
       // Express.js ব্যাকএন্ড হলে:
-      res.status(200).json({ message: "new destination added" });
+      // res.status(200).json({ message: "new destination added" });
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
