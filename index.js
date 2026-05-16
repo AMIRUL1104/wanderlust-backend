@@ -28,6 +28,7 @@ async function run() {
 
     //  "destination" collection select করা হয়েছে
     const destinationCollection = database.collection("destination");
+    const bookingCollection = database.collection("booking");
 
     app.get("/destination", async (req, res) => {
       const result = await destinationCollection.find().toArray();
@@ -71,7 +72,44 @@ async function run() {
         _id: new ObjectId(id),
       };
 
-      const result = await userCollection.deleteOne(query);
+      const result = await destinationCollection.deleteOne(query);
+
+      res.send(result);
+    });
+
+    app.get("/booking", async (req, res) => {
+      const result = await bookingCollection.find().toArray();
+      res.json(result);
+    });
+
+    // add a new destination
+    app.post("/booking", async (req, res) => {
+      const newBooking = req.body;
+      const result = await bookingCollection.insertOne(newBooking);
+      res.send(result);
+    });
+
+    app.get("/booking/:userid", async (req, res) => {
+      const id = req.params.userid;
+      console.log(id);
+
+      const result = await bookingCollection
+        .find({
+          userId: { $eq: id },
+        })
+        .toArray();
+
+      res.json(result);
+    });
+
+    app.delete("/booking/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = {
+        _id: new ObjectId(id),
+      };
+
+      const result = await bookingCollection.deleteOne(query);
 
       res.send(result);
     });
